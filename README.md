@@ -8,25 +8,26 @@ When you run several agents at once, the transcript gets crowded and it is hard 
 3 active · 1 finished
 
 ── ● Review node changes ─────────────────────────
-  running · 2m 50s · reviewer-node
+  teammate · running · 2m 50s · reviewer-node
 ─────────────────────────────────── @review-node ─
 
 ── ● Review security of the auth flow ────────────
-  running · 2m 46s · reviewer-security
+  teammate · running · 2m 46s · reviewer-security
 ──────────────────────────────────── @review-sec ─
 
 ── ◐ Write the failing tests ─────────────────────
-  waiting · 1m 12s
+  subagent · waiting · 1m 12s
 ──────────────────────────────── general-purpose ─
 
 ── ✓ Explore the codebase ────────────────────────
-  done · 21s
+  subagent · done · 21s
 ──────────────────────────────────────── Explore ─
 ```
 
 ## What it shows
 
 - **One card per agent**, each in its own color that stays the same for the whole session.
+- **Kind** of agent: `teammate` or `subagent`.
 - **Status** at a glance: queued, running, waiting, idle, done, failed, stopped.
 - **Elapsed time**, ticking only while the agent works.
 - **The tag** on the closing rule: `@name` for teammates, the agent type for subagents.

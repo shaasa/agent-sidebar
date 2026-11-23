@@ -100,7 +100,8 @@ export const register: Register = on => {
                 <Text color={color}> {rule(width - 4 - [...title].length)}</Text>
               </Box>
               <Text wrap="truncate-end">
-                <Text color={label.color}>  {label.word}</Text>
+                <Text dimColor>  {row.teammate ? 'teammate' : 'subagent'} · </Text>
+                <Text color={label.color}>{label.word}</Text>
                 <Text dimColor>
                   {' '}· {time}{row.name ? ` · ${row.type}` : ''}
                 </Text>

@@ -1,1 +1,1 @@
-{ "name": "agent-sidebar", "version": "0.2.0", "description": "A tmux-style side pane that shows every subagent and teammate of the session as its own colored card: status, elapsed time, type", "types": "./types/index.d.ts" }
+{ "name": "agent-sidebar", "version": "0.2.1", "description": "A tmux-style side pane that shows every subagent and teammate of the session as its own colored card: status, elapsed time, type", "types": "./types/index.d.ts" }
