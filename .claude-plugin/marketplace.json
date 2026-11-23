@@ -1,0 +1,5 @@
+{
+  "name": "agent-sidebar",
+  "owner": { "name": "shaasa" },
+  "plugins": [{ "name": "agent-sidebar", "source": "./" }]
+}
