@@ -5,15 +5,15 @@ A Claude Code mod that gives your **subagents and teammates** a side pane of the
 When you run several agents at once, the transcript gets crowded and it is hard to tell who is doing what. `agent-sidebar` opens a pane beside the chat with one colored card per agent, separated by rules and labeled with a tag on the right, the same way tmux frames its panes:
 
 ```
-3 active · 1 finished
+2 active · 1 finished
+
+── ● Main session ────────────────────────────────
+  main · running · 4m 10s
+─────────────────────────────────────────── main ─
 
 ── ● Review node changes ─────────────────────────
   teammate · running · 2m 50s · reviewer-node
 ─────────────────────────────────── @review-node ─
-
-── ● Review security of the auth flow ────────────
-  teammate · running · 2m 46s · reviewer-security
-──────────────────────────────────── @review-sec ─
 
 ── ◐ Write the failing tests ─────────────────────
   subagent · waiting · 1m 12s
@@ -26,15 +26,17 @@ When you run several agents at once, the transcript gets crowded and it is hard 
 
 ## What it shows
 
+- **The main session** on top, always in the same color, with its own status and turn time.
 - **One card per agent**, each in its own color that stays the same for the whole session.
 - **Kind** of agent: `teammate` or `subagent`.
 - **Status** at a glance: queued, running, waiting, idle, done, failed, stopped.
 - **Elapsed time**, ticking only while the agent works.
 - **The tag** on the closing rule: `@name` for teammates, the agent type for subagents.
 - **Nested agents** marked with `↳`.
-- **Click a card's title** to jump to that agent's transcript.
+- **Click a card's title** to jump to that agent's transcript (the main card takes you back).
 - Active agents first, then finished ones, most recent first.
 - Long titles are cut with `…`, so the rules never wrap.
+- **Hides Claude Code's own agent list** under the prompt: the pane shows the same agents, and the chat gets its room back.
 
 ## Install
 
@@ -60,8 +62,17 @@ In the desktop app, where `/plugin` does not run: click **+** next to the prompt
 - Open it any time with:
 
 ```
-/agents
+/agent-sidebar
 ```
+
+## Palette
+
+Pick the look when you install, or later in `/config`:
+
+| Value | Look |
+| --- | --- |
+| `colorful` (default) | Every agent gets its own color; the main session is always Claude orange. |
+| `two-tone` | Only two muted colors: blue-gray for **teammates**, sand for **subagents**. The main session is always **gray**, and status words are plain. |
 
 ## Develop
 

@@ -11,8 +11,10 @@ export type AgentRow = {
   endedAt?: number
 }
 
+export type MainState = { status: 'running' | 'idle'; startedAt: number; endedAt?: number }
+
 declare module 'claude-code' {
   interface PluginState {
-    'agent-sidebar': { rows: AgentRow[]; now: number }
+    'agent-sidebar': { rows: AgentRow[]; now: number; main: MainState }
   }
 }

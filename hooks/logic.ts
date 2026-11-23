@@ -58,3 +58,13 @@ export const clip = (text: string, max: number): string => {
 }
 
 export const rule = (cells: number): string => '─'.repeat(Math.max(1, cells))
+
+export type Palette = 'colorful' | 'two-tone'
+
+// Two-tone: muted hues far apart, one per kind; the main session is always gray.
+export const TEAMMATE_COLOR = '#7f9fbf'
+export const SUBAGENT_COLOR = '#bfa57f'
+export const MAIN_COLOR: Record<Palette, string> = { colorful: '#d97757', 'two-tone': '#8a8a8a' }
+
+export const colorOf = (row: AgentRow, palette: Palette): string =>
+  palette === 'two-tone' ? (row.teammate ? TEAMMATE_COLOR : SUBAGENT_COLOR) : (row.color ?? PALETTE[0]!)

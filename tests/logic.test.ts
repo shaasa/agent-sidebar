@@ -1,7 +1,7 @@
 import { expect, test } from 'claude-code/testing'
 import type { AgentInfo } from 'claude-code'
 
-import { PALETTE, clip, elapsed, merge, rule } from '../hooks/logic'
+import { PALETTE, SUBAGENT_COLOR, TEAMMATE_COLOR, clip, colorOf, elapsed, merge, rule } from '../hooks/logic'
 
 // Only the fields merge reads: the rest of AgentInfo is not needed here.
 const agent = (id: string, status: AgentInfo['status'], parentId?: string, kind: AgentInfo['kind'] = 'local_agent') =>
@@ -62,4 +62,10 @@ test('clip adds an ellipsis only past the limit', () => {
   expect(clip('abc', 5)).toBe('abc')
   expect(clip('abcdef', 4)).toBe('abc…')
   expect(rule(0)).toBe('─')
+})
+
+test('two-tone gives one color per kind, colorful keeps each agent its own', () => {
+  const [sub, mate] = merge([], [agent('a', 'running'), agent('b', 'running', undefined, 'in_process_teammate')], 0)
+  expect([colorOf(sub!, 'two-tone'), colorOf(mate!, 'two-tone')]).toEqual([SUBAGENT_COLOR, TEAMMATE_COLOR])
+  expect([colorOf(sub!, 'colorful'), colorOf(mate!, 'colorful')]).toEqual([PALETTE[0], PALETTE[1]])
 })
