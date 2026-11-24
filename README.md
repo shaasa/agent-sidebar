@@ -22,6 +22,7 @@ When you run several agents at once, the transcript gets crowded and it is hard 
 - **Click a card's title** to jump to that agent's transcript (the main card takes you back).
 - Active agents first, then finished ones, most recent first.
 - Long titles are cut with `…`, so the rules never wrap.
+- **A system notification** when an agent finishes or fails, so you can look away while agents work. Turn it off with the `notifications` option.
 - **Hides Claude Code's own agent list** under the prompt: the pane shows the same agents, and the chat gets its room back.
 
 ## Install
@@ -59,6 +60,12 @@ Pick the look when you install, or later in `/config`:
 | --- | --- |
 | `colorful` (default) | Every agent gets its own color; the main session is always Claude orange. |
 | `two-tone` | Only two muted colors: blue-gray for **teammates**, sand for **subagents**. The main session is always **gray**, and status words are plain. |
+
+## Notifications
+
+When an agent **finishes or fails**, `agent-sidebar` sends a system notification through the channel set in Claude Code (iTerm2, kitty, Ghostty, or the terminal bell). Stopped agents send none.
+
+Turn them off when you install, or later in `/config`, with `notifications` set to `false`.
 
 ## Develop
 

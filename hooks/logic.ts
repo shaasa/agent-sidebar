@@ -68,3 +68,9 @@ export const MAIN_COLOR: Record<Palette, string> = { colorful: '#d97757', 'two-t
 
 export const colorOf = (row: AgentRow, palette: Palette): string =>
   palette === 'two-tone' ? (row.teammate ? TEAMMATE_COLOR : SUBAGENT_COLOR) : (row.color ?? PALETTE[0]!)
+
+// Agents that reached `completed` or `failed` since the last poll: one seen running, never one first seen finished.
+export const justFinished = (before: AgentRow[], after: AgentRow[]): AgentRow[] => {
+  const wasActive = new Set(before.filter(row => !FINISHED.has(row.status)).map(row => row.id))
+  return after.filter(row => wasActive.has(row.id) && (row.status === 'completed' || row.status === 'failed'))
+}

@@ -1,7 +1,7 @@
 import { expect, test } from 'claude-code/testing'
 import type { AgentInfo } from 'claude-code'
 
-import { PALETTE, SUBAGENT_COLOR, TEAMMATE_COLOR, clip, colorOf, elapsed, merge, rule } from '../hooks/logic'
+import { PALETTE, SUBAGENT_COLOR, TEAMMATE_COLOR, clip, colorOf, elapsed, justFinished, merge, rule } from '../hooks/logic'
 
 // Only the fields merge reads: the rest of AgentInfo is not needed here.
 const agent = (id: string, status: AgentInfo['status'], parentId?: string, kind: AgentInfo['kind'] = 'local_agent') =>
@@ -68,4 +68,11 @@ test('two-tone gives one color per kind, colorful keeps each agent its own', () 
   const [sub, mate] = merge([], [agent('a', 'running'), agent('b', 'running', undefined, 'in_process_teammate')], 0)
   expect([colorOf(sub!, 'two-tone'), colorOf(mate!, 'two-tone')]).toEqual([SUBAGENT_COLOR, TEAMMATE_COLOR])
   expect([colorOf(sub!, 'colorful'), colorOf(mate!, 'colorful')]).toEqual([PALETTE[0], PALETTE[1]])
+})
+
+test('justFinished reports agents that completed or failed since the last poll, once', () => {
+  const start = merge([], [agent('a', 'running'), agent('b', 'running'), agent('c', 'running'), agent('d', 'completed')], 0)
+  const next = merge(start, [agent('a', 'completed'), agent('b', 'failed'), agent('c', 'killed')], 10)
+  expect(justFinished(start, next).map(row => row.id).sort()).toEqual(['a', 'b'])
+  expect(justFinished(next, merge(next, [], 20))).toEqual([])
 })

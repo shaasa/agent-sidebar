@@ -1,6 +1,6 @@
 {
   "name": "agent-sidebar",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "A tmux-style side pane that shows every subagent and teammate of the session as its own colored card: status, elapsed time, type",
   "types": "./types/index.d.ts",
   "userConfig": {
@@ -13,6 +13,12 @@
         "two-tone"
       ],
       "default": "colorful"
+    },
+    "notifications": {
+      "type": "boolean",
+      "title": "Notifications",
+      "description": "Send a system notification when an agent finishes or fails.",
+      "default": true
     }
   }
 }

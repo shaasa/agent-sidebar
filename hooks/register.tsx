@@ -2,7 +2,7 @@ import { atom, read, update } from 'claude-code'
 import type { Register } from 'claude-code'
 
 import type { AgentRow } from '../types'
-import { FINISHED, MAIN_COLOR, clip, colorOf, elapsed, merge, rule } from './logic'
+import { FINISHED, MAIN_COLOR, clip, colorOf, elapsed, justFinished, merge, rule } from './logic'
 import type { Palette } from './logic'
 
 const PANE = 'agents'
@@ -24,6 +24,7 @@ const LABEL: Record<AgentRow['status'], { icon: string; word: string; color: str
 
 export const register: Register = (on, options) => {
   const palette: Palette = options.palette === 'two-tone' ? 'two-tone' : 'colorful'
+  const notifications = options.notifications !== false
 
   on('session.start', async ($, e, next) => {
     await $.command.register({
@@ -39,6 +40,16 @@ export const register: Register = (on, options) => {
         const after = merge(before, live, now)
         if (JSON.stringify(after) !== JSON.stringify(before)) {
           await update($, rows, () => after)
+        }
+        if (notifications) {
+          for (const row of justFinished(before, after)) {
+            const label = LABEL[row.status]
+            const time = elapsed((row.endedAt ?? now) - row.startedAt)
+            // A system notification can fail (no channel, turned off): the pane still shows it.
+            await $.ui
+              .notify(`${label.icon} ${row.name ? `@${row.name} ` : ''}${row.description} ${label.word} · ${time}`, { title: 'agent-sidebar' })
+              .catch(() => undefined)
+          }
         }
         // The clock ticks only while someone is working: no redraws at rest.
         const busy = (await read($, main)).status === 'running' || after.some(row => !FINISHED.has(row.status))
