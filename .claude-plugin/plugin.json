@@ -8,6 +8,20 @@
   },
   "license": "MIT",
   "repository": "https://github.com/shaasa/agent-sidebar",
+  "keywords": [
+    "agents",
+    "subagents",
+    "teammates",
+    "agent-teams",
+    "sidebar",
+    "pane",
+    "tmux",
+    "monitoring",
+    "cost",
+    "tokens",
+    "notifications",
+    "ui"
+  ],
   "types": "./types/index.d.ts",
   "userConfig": {
     "palette": {
