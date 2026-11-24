@@ -123,10 +123,24 @@ claude plugin update agent-sidebar@agent-sidebar
 | `ui.render` on `Pane` | Draws the pane. |
 | `ui.render` on `AgentRow` | Hides the rows of Claude Code's own agent list under the prompt. The agents themselves are untouched. |
 
-### What it sends, and where
-- **Nothing over the network.** It makes no web requests and calls no other plugin.
-- **System notifications** (`$.ui.notify`), only when an agent finishes or fails and the `notifications` option is on: Claude Code hands the text (the agent's name, description, status and elapsed time) to the notification channel set in Claude Code, on your own computer (iTerm2, kitty, Ghostty or the terminal bell).
-- **No files.** It writes nothing to disk; what the pane shows lives in Claude Code's session state and goes away with the session.
+### What it sends, and where (egress)
+- **Nothing leaves your computer.** No web requests, no other plugin called, no files written.
+- **Notifications** are the only way out of Claude Code, and only to your own desktop: `$.ui.notify` hands the text to the notification channel set in Claude Code (iTerm2, kitty, Ghostty or the terminal bell). The text is the agent's name, description, status and elapsed time. It is sent only when an agent finishes or fails, and never with the `notifications` option off.
+
+Every call the mod makes, and what it does:
+
+| Call | What it does | Sends anything out? |
+| --- | --- | --- |
+| `$.ui.notify` | Shows a system notification on your computer through Claude Code's notification channel. | Only to your own desktop, as above. |
+| `$.agent.list` | Reads the session's subagents and teammates. | No |
+| `$.session.usage` | Reads the session's cost estimate, the same as `/cost`. | No |
+| `$.clock.every`, `$.clock.now` | Run the once-a-second refresh and read the time. | No |
+| `$.command.register` | Adds the `/agent-sidebar` command. | No |
+| `$.state.get`, `$.state.set` | Keep what the pane shows in the session's memory. | No |
+| `$.ui.open`, `$.ui.panes` | Open the pane, and check whether it is open. | No |
+| `$.ui.resolve` | Gets the elements the pane is drawn with. | No |
+| `$.ui.view` | Switches the view to the agent whose card you clicked. | No |
+| `$.ui.toast` | Shows a short message inside Claude Code when that switch fails. | No |
 
 ## Develop
 
