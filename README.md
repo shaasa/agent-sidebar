@@ -4,25 +4,11 @@ A Claude Code mod that gives your **subagents and teammates** a side pane of the
 
 When you run several agents at once, the transcript gets crowded and it is hard to tell who is doing what. `agent-sidebar` opens a pane beside the chat with one colored card per agent, separated by rules and labeled with a tag on the right, the same way tmux frames its panes:
 
-```
-2 active · 1 finished
+| `colorful` (default) | `two-tone` |
+| --- | --- |
+| ![colorful palette](docs/colorful.png) | ![two-tone palette](docs/two-tone.png) |
 
-── ● Main session ────────────────────────────────
-  main · running · 4m 10s
-─────────────────────────────────────────── main ─
-
-── ● Review node changes ─────────────────────────
-  teammate · running · 2m 50s · reviewer-node
-─────────────────────────────────── @review-node ─
-
-── ◐ Write the failing tests ─────────────────────
-  subagent · waiting · 1m 12s
-──────────────────────────────── general-purpose ─
-
-── ✓ Explore the codebase ────────────────────────
-  subagent · done · 21s
-──────────────────────────────────────── Explore ─
-```
+<sub>Rendered previews of the pane's layout and colors.</sub>
 
 ## What it shows
 
