@@ -110,6 +110,24 @@ claude plugin marketplace update agent-sidebar
 claude plugin update agent-sidebar@agent-sidebar
 ```
 
+## What it runs and what it sends
+
+`agent-sidebar` is a Claude Code mod: one hooks module, `hooks/register.tsx`, with no other code, no dependencies and no scripts.
+
+### What each hook does
+| Hook | What it does |
+| --- | --- |
+| `session.start` | Registers the `/agent-sidebar` command. Once a second it reads the session's agent list (`$.agent.list`) and the session's cost estimate (`$.session.usage`), updates the pane, opens the pane when a new agent appears, and sends a notification when an agent finishes or fails. |
+| `turn.start`, `turn.complete` | Mark the main session as running or idle, for the main card. They change nothing in the turn. |
+| `command.run` (`/agent-sidebar`) | Opens the pane. |
+| `ui.render` on `Pane` | Draws the pane. |
+| `ui.render` on `AgentRow` | Hides the rows of Claude Code's own agent list under the prompt. The agents themselves are untouched. |
+
+### What it sends, and where
+- **Nothing over the network.** It makes no web requests and calls no other plugin.
+- **System notifications** (`$.ui.notify`), only when an agent finishes or fails and the `notifications` option is on: Claude Code hands the text (the agent's name, description, status and elapsed time) to the notification channel set in Claude Code, on your own computer (iTerm2, kitty, Ghostty or the terminal bell).
+- **No files.** It writes nothing to disk; what the pane shows lives in Claude Code's session state and goes away with the session.
+
 ## Develop
 
 ```
