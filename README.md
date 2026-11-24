@@ -92,6 +92,15 @@ Sent through the notification channel set in Claude Code: iTerm2, kitty, Ghostty
 
 ## Update
 
+### Automatic updates
+Claude Code does not auto-update plugins from third-party marketplaces unless you turn it on. To turn it on:
+
+1. Run `/plugin`.
+2. Open the **Marketplaces** tab.
+3. Select `agent-sidebar` and turn on **auto-update**.
+
+### By hand
+
 At the prompt, run `/plugin`, pick `agent-sidebar` and choose **update**. The running session reloads the mod, no restart needed.
 
 From a shell (applies to sessions started afterwards):

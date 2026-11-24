@@ -1,5 +1,13 @@
 {
   "name": "agent-sidebar",
-  "owner": { "name": "shaasa" },
-  "plugins": [{ "name": "agent-sidebar", "source": "./" }]
+  "owner": {
+    "name": "shaasa"
+  },
+  "plugins": [
+    {
+      "name": "agent-sidebar",
+      "source": "./"
+    }
+  ],
+  "description": "agent-sidebar: a tmux-style side pane for Claude Code subagents and teammates"
 }
