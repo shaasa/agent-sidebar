@@ -1,7 +1,7 @@
 import { expect, test } from 'claude-code/testing'
 import type { AgentInfo } from 'claude-code'
 
-import { PALETTE, SUBAGENT_COLOR, TEAMMATE_COLOR, clip, colorOf, elapsed, justFinished, merge, rule } from '../hooks/logic'
+import { PALETTE, SUBAGENT_COLOR, TEAMMATE_COLOR, clip, colorOf, elapsed, justFinished, merge, rule, spend } from '../hooks/logic'
 
 // Only the fields merge reads: the rest of AgentInfo is not needed here.
 const agent = (id: string, status: AgentInfo['status'], parentId?: string, kind: AgentInfo['kind'] = 'local_agent') =>
@@ -75,4 +75,17 @@ test('justFinished reports agents that completed or failed since the last poll, 
   const next = merge(start, [agent('a', 'completed'), agent('b', 'failed'), agent('c', 'killed')], 10)
   expect(justFinished(start, next).map(row => row.id).sort()).toEqual(['a', 'b'])
   expect(justFinished(next, merge(next, [], 20))).toEqual([])
+})
+
+test('spend shows tokens and the estimated cost, leaving out what is missing', () => {
+  expect(spend(10_400, 0.123)).toBe('10.4k tok · ~$0.12')
+  expect(spend(950)).toBe('950 tok')
+  expect(spend(2_500_000, 0)).toBe('2.5M tok')
+  expect(spend(0, undefined)).toBe('')
+})
+
+test('tokens and cost follow the engine and stay once the agent leaves its list', () => {
+  const live = { ...agent('a', 'running'), tokenCount: 5000, cost: { usd: 0.4 } }
+  const rows = merge(merge([], [live], 0), [], 10)
+  expect([rows[0]?.tokens, rows[0]?.usd]).toEqual([5000, 0.4])
 })

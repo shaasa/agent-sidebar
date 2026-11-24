@@ -41,6 +41,9 @@ export const merge = (seen: AgentRow[], live: AgentInfo[], now: number): AgentRo
       color: old?.color ?? PALETTE[next++ % PALETTE.length],
       startedAt: old?.startedAt ?? now,
       endedAt: FINISHED.has(info.status) ? (old?.endedAt ?? now) : undefined,
+      // The engine's reading, kept once the agent leaves its list.
+      tokens: info.tokenCount || old?.tokens,
+      usd: info.cost?.usd ?? old?.usd,
     })
   }
   const all = [...byId.values()]
@@ -74,3 +77,10 @@ export const justFinished = (before: AgentRow[], after: AgentRow[]): AgentRow[] 
   const wasActive = new Set(before.filter(row => !FINISHED.has(row.status)).map(row => row.id))
   return after.filter(row => wasActive.has(row.id) && (row.status === 'completed' || row.status === 'failed'))
 }
+
+const compact = (n: number): string =>
+  n < 1000 ? String(n) : n < 1_000_000 ? `${(n / 1000).toFixed(1)}k` : `${(n / 1_000_000).toFixed(1)}M`
+
+// "10.4k tok · ~$0.12": the cost is the engine's estimate, hence the tilde. Empty parts are left out.
+export const spend = (tokens?: number, usd?: number): string =>
+  [tokens ? `${compact(tokens)} tok` : '', usd ? `~$${usd.toFixed(2)}` : ''].filter(Boolean).join(' · ')

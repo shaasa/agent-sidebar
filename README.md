@@ -17,6 +17,7 @@ When you run several agents at once, the transcript gets crowded and it is hard 
 - **Kind** of agent: `teammate` or `subagent`.
 - **Status** at a glance: queued, running, waiting, idle, done, failed, stopped.
 - **Elapsed time**, ticking only while the agent works.
+- **Tokens and estimated cost** per agent (`10.4k tok · ~$0.12`), and the session total on the main card. The cost is Claude Code's own estimate, the same as `/cost`: on a subscription it is not what you pay.
 - **The tag** on the closing rule: `@name` for teammates, the agent type for subagents.
 - **Nested agents** marked with `↳`.
 - **Click a card's title** to jump to that agent's transcript (the main card takes you back).

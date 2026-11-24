@@ -2,7 +2,7 @@ import { atom, read, update } from 'claude-code'
 import type { Register } from 'claude-code'
 
 import type { AgentRow } from '../types'
-import { FINISHED, MAIN_COLOR, clip, colorOf, elapsed, justFinished, merge, rule } from './logic'
+import { FINISHED, MAIN_COLOR, clip, colorOf, elapsed, justFinished, merge, rule, spend } from './logic'
 import type { Palette } from './logic'
 
 const PANE = 'agents'
@@ -10,6 +10,7 @@ const TITLE = 'Agents'
 
 const rows = atom({ plugin: 'agent-sidebar', key: 'rows' } as const, [])
 const clock = atom({ plugin: 'agent-sidebar', key: 'now' } as const, 0)
+const total = atom({ plugin: 'agent-sidebar', key: 'total' } as const, 0)
 const main = atom({ plugin: 'agent-sidebar', key: 'main' } as const, { status: 'idle', startedAt: 0 })
 
 const LABEL: Record<AgentRow['status'], { icon: string; word: string; color: string }> = {
@@ -51,6 +52,8 @@ export const register: Register = (on, options) => {
               .catch(() => undefined)
           }
         }
+        const usd = (await $.session.usage()).cost?.usd ?? 0
+        if (usd !== (await read($, total))) await update($, total, () => usd)
         // The clock ticks only while someone is working: no redraws at rest.
         const busy = (await read($, main)).status === 'running' || after.some(row => !FINISHED.has(row.status))
         if (busy) await update($, clock, () => now)
@@ -98,6 +101,7 @@ export const register: Register = (on, options) => {
     const { Box, Button, Text } = $.ui.resolve(e)
     const list = await read($, rows)
     const session = await read($, main)
+    const sessionUsd = await read($, total)
     const now = Math.max(await read($, clock), session.endedAt ?? 0, ...list.map(row => row.endedAt ?? 0))
     const width = Math.max(20, e.props.bodyColumns ?? e.viewport?.columns ?? 60)
     // Each card: header, status, closing rule and one blank line; the main card takes one slot.
@@ -161,6 +165,7 @@ export const register: Register = (on, options) => {
           kind: 'main',
           status: session.status,
           time: session.startedAt ? elapsed((session.status === 'running' ? now : (session.endedAt ?? now)) - session.startedAt) : '—',
+          extra: sessionUsd ? `${spend(undefined, sessionUsd)} total` : undefined,
           tag: 'main',
           color: MAIN_COLOR[palette],
           open: view(),
@@ -172,7 +177,8 @@ export const register: Register = (on, options) => {
             kind: row.teammate ? 'teammate' : 'subagent',
             status: row.status,
             time: elapsed((row.endedAt ?? now) - row.startedAt),
-            extra: row.name ? row.type : undefined,
+            // Tokens and cost before the type: a narrow pane cuts the end of the line.
+          extra: [spend(row.tokens, row.usd), row.name ? row.type : ''].filter(Boolean).join(' · '),
             tag: row.name ? `@${row.name}` : row.type,
             color: colorOf(row, palette),
             open: view(row.id),
