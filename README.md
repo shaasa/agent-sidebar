@@ -10,21 +10,34 @@ When you run several agents at once, the transcript gets crowded and it is hard 
 
 <sub>Rendered previews of the pane's layout and colors.</sub>
 
-## What it shows
+## Features
 
-- **The main session** on top, always in the same color, with its own status and turn time.
-- **One card per agent**, each in its own color that stays the same for the whole session.
+### A card for every agent
+- **The main session** on top, always in the same color, with its status, turn time and the session's total cost.
+- **One card per agent**, in a color that stays the same for the whole session.
 - **Kind** of agent: `teammate` or `subagent`.
 - **Status** at a glance: queued, running, waiting, idle, done, failed, stopped.
 - **Elapsed time**, ticking only while the agent works.
-- **Tokens and estimated cost** per agent (`10.4k tok · ~$0.12`), and the session total on the main card. The cost is Claude Code's own estimate, the same as `/cost`: on a subscription it is not what you pay.
 - **The tag** on the closing rule: `@name` for teammates, the agent type for subagents.
 - **Nested agents** marked with `↳`.
-- **Click a card's title** to jump to that agent's transcript (the main card takes you back).
 - Active agents first, then finished ones, most recent first.
-- Long titles are cut with `…`, so the rules never wrap.
-- **A system notification** when an agent finishes or fails, so you can look away while agents work. Turn it off with the `notifications` option.
-- **Hides Claude Code's own agent list** under the prompt: the pane shows the same agents, and the chat gets its room back.
+- **Click a card's title** to jump to that agent's transcript; the main card takes you back.
+
+### Tokens and cost
+- **Tokens and estimated cost** on every card: `8.2k tok · ~$0.31`.
+- **The session total** on the main card: `~$1.84 total`.
+- They stay on the card after the agent is gone.
+- In a narrow pane the line is cut at its end, so tokens and cost come before the agent type.
+- The cost is **Claude Code's own estimate**, the same figure as `/cost`. On a subscription it is not what you pay.
+- The tokens are Claude Code's own count: the latest request's input plus all the output so far.
+
+### System notifications
+- A notification when an agent **finishes or fails**, so you can look away while agents work.
+- Stopped agents send none, and each agent sends one at most.
+- Turn them off with the `notifications` option.
+
+### More room for the chat
+- **Hides Claude Code's own agent list** under the prompt: the pane shows the same agents.
 
 ## Install
 
@@ -53,20 +66,40 @@ In the desktop app, where `/plugin` does not run: click **+** next to the prompt
 /agent-sidebar
 ```
 
-## Palette
+## Options
 
-Pick the look when you install, or later in `/config`:
+Set them when you install, later in `/config`, or with:
+
+```
+/plugin configure agent-sidebar@agent-sidebar
+```
+
+| Option | Values | Default |
+| --- | --- | --- |
+| `palette` | `colorful`, `two-tone` | `colorful` |
+| `notifications` | `true`, `false` | `true` |
+
+### Palette
 
 | Value | Look |
 | --- | --- |
-| `colorful` (default) | Every agent gets its own color; the main session is always Claude orange. |
+| `colorful` | Every agent gets its own color; the main session is always Claude orange. |
 | `two-tone` | Only two muted colors: blue-gray for **teammates**, sand for **subagents**. The main session is always **gray**, and status words are plain. |
 
-## Notifications
+### Notifications
 
-When an agent **finishes or fails**, `agent-sidebar` sends a system notification through the channel set in Claude Code (iTerm2, kitty, Ghostty, or the terminal bell). Stopped agents send none.
+Sent through the notification channel set in Claude Code: iTerm2, kitty, Ghostty, or the terminal bell. If no channel is set, nothing is sent and the pane still shows the change.
 
-Turn them off when you install, or later in `/config`, with `notifications` set to `false`.
+## Update
+
+At the prompt, run `/plugin`, pick `agent-sidebar` and choose **update**. The running session reloads the mod, no restart needed.
+
+From a shell (applies to sessions started afterwards):
+
+```
+claude plugin marketplace update agent-sidebar
+claude plugin update agent-sidebar@agent-sidebar
+```
 
 ## Develop
 
