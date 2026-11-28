@@ -104,8 +104,6 @@ export const register: Register = (on, options) => {
     const sessionUsd = await read($, total)
     const now = Math.max(await read($, clock), session.endedAt ?? 0, ...list.map(row => row.endedAt ?? 0))
     const width = Math.max(20, e.props.bodyColumns ?? e.viewport?.columns ?? 60)
-    // Each card: header, status, closing rule and one blank line; the main card takes one slot.
-    const room = Math.max(0, Math.floor(((e.viewport?.rows ?? 24) - 4) / 4) - 1)
     const active = list.filter(row => !FINISHED.has(row.status)).length
 
     const card = (c: {
@@ -170,7 +168,8 @@ export const register: Register = (on, options) => {
           color: MAIN_COLOR[palette],
           open: view(),
         })}
-        {list.slice(0, room).map(row =>
+        {/* No cut to the screen's height: the engine scrolls a body taller than its window. */}
+        {list.map(row =>
           card({
             key: `agent:${row.id}`,
             title: `${row.parentId ? '↳ ' : ''}${LABEL[row.status].icon} ${row.description}`,
