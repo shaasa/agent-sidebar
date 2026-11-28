@@ -84,3 +84,15 @@ const compact = (n: number): string =>
 // "10.4k tok · ~$0.12": the cost is the engine's estimate, hence the tilde. Empty parts are left out.
 export const spend = (tokens?: number, usd?: number): string =>
   [tokens ? `${compact(tokens)} tok` : '', usd ? `~$${usd.toFixed(2)}` : ''].filter(Boolean).join(' · ')
+
+// Each card: a blank line, header, status and closing rule.
+export const CARD_ROWS = 4
+
+// Cards that fit under the pinned count line.
+export const fitting = (bodyRows: number): number => Math.max(1, Math.floor((bodyRows - 1) / CARD_ROWS))
+
+// The first card shown after a scroll of `by` rows: whole cards, at least one per wheel tick, kept in range.
+export const scrolled = (skip: number, by: number, cards: number, bodyRows: number): number => {
+  const step = Math.sign(by) * Math.max(1, Math.round(Math.abs(by) / CARD_ROWS))
+  return Math.min(Math.max(0, skip + step), Math.max(0, cards - fitting(bodyRows)))
+}

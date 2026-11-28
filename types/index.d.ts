@@ -17,6 +17,6 @@ export type MainState = { status: 'running' | 'idle'; startedAt: number; endedAt
 
 declare module 'claude-code' {
   interface PluginState {
-    'agent-sidebar': { rows: AgentRow[]; now: number; main: MainState; total: number }
+    'agent-sidebar': { rows: AgentRow[]; now: number; main: MainState; total: number; skip: number }
   }
 }

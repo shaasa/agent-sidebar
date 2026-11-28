@@ -1,7 +1,7 @@
 import { expect, test } from 'claude-code/testing'
 import type { AgentInfo } from 'claude-code'
 
-import { PALETTE, SUBAGENT_COLOR, TEAMMATE_COLOR, clip, colorOf, elapsed, justFinished, merge, rule, spend } from '../hooks/logic'
+import { PALETTE, SUBAGENT_COLOR, TEAMMATE_COLOR, clip, colorOf, elapsed, fitting, justFinished, merge, rule, scrolled, spend } from '../hooks/logic'
 
 // Only the fields merge reads: the rest of AgentInfo is not needed here.
 const agent = (id: string, status: AgentInfo['status'], parentId?: string, kind: AgentInfo['kind'] = 'local_agent') =>
@@ -88,4 +88,15 @@ test('tokens and cost follow the engine and stay once the agent leaves its list'
   const live = { ...agent('a', 'running'), tokenCount: 5000, cost: { usd: 0.4 } }
   const rows = merge(merge([], [live], 0), [], 10)
   expect([rows[0]?.tokens, rows[0]?.usd]).toEqual([5000, 0.4])
+})
+
+test('the pane scrolls whole cards and stays in range', () => {
+  // 21 rows: the count line and five cards of four rows.
+  expect(fitting(21)).toBe(5)
+  expect(fitting(3)).toBe(1)
+  expect(scrolled(0, 1, 8, 21)).toBe(1)
+  expect(scrolled(0, -1, 8, 21)).toBe(0)
+  expect(scrolled(2, 20, 8, 21)).toBe(3)
+  expect(scrolled(3, 1, 8, 21)).toBe(3)
+  expect(scrolled(0, 1, 4, 21)).toBe(0)
 })

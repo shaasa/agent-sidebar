@@ -2,7 +2,7 @@ import { atom, read, update } from 'claude-code'
 import type { Register } from 'claude-code'
 
 import type { AgentRow } from '../types'
-import { FINISHED, MAIN_COLOR, clip, colorOf, elapsed, justFinished, merge, rule, spend } from './logic'
+import { FINISHED, MAIN_COLOR, clip, colorOf, elapsed, fitting, justFinished, merge, rule, scrolled, spend } from './logic'
 import type { Palette } from './logic'
 
 const PANE = 'agents'
@@ -11,6 +11,7 @@ const TITLE = 'Agents'
 const rows = atom({ plugin: 'agent-sidebar', key: 'rows' } as const, [])
 const clock = atom({ plugin: 'agent-sidebar', key: 'now' } as const, 0)
 const total = atom({ plugin: 'agent-sidebar', key: 'total' } as const, 0)
+const skip = atom({ plugin: 'agent-sidebar', key: 'skip' } as const, 0)
 const main = atom({ plugin: 'agent-sidebar', key: 'main' } as const, { status: 'idle', startedAt: 0 })
 
 const LABEL: Record<AgentRow['status'], { icon: string; word: string; color: string }> = {
@@ -97,6 +98,13 @@ export const register: Register = (on, options) => {
     return { text: opened.isPlaced ? 'Agents pane opened.' : 'Agents pane waiting for room.' }
   })
 
+  // The pane scrolls its own cards, so the count line above them stays put: the engine's window never moves.
+  on('ui.scroll', { component: 'Pane', requestId: PANE }, async ($, e) => {
+    const cards = (await read($, rows)).length + 1
+    await update($, skip, old => scrolled(old, e.by, cards, e.bodyRows))
+    return {}
+  })
+
   on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e) => {
     const { Box, Button, Text } = $.ui.resolve(e)
     const list = await read($, rows)
@@ -105,6 +113,10 @@ export const register: Register = (on, options) => {
     const now = Math.max(await read($, clock), session.endedAt ?? 0, ...list.map(row => row.endedAt ?? 0))
     const width = Math.max(20, e.props.bodyColumns ?? e.viewport?.columns ?? 60)
     const active = list.filter(row => !FINISHED.has(row.status)).length
+    const fit = fitting(e.props.scroll.bodyRows)
+    // Clamped again here: the list may have shrunk since the last scroll.
+    const first = Math.min(await read($, skip), Math.max(0, list.length + 1 - fit))
+    const below = Math.max(0, list.length + 1 - first - fit)
 
     const card = (c: {
       key: string
@@ -156,33 +168,36 @@ export const register: Register = (on, options) => {
       <Box flexDirection="column">
         <Text bold>
           {active} active · {list.length - active} finished
+          {first ? <Text dimColor> · ↑ {first}</Text> : null}
+          {below ? <Text dimColor> · ↓ {below} more</Text> : null}
         </Text>
-        {card({
-          key: 'agent:main',
-          title: `${session.status === 'running' ? '●' : '◌'} Main session`,
-          kind: 'main',
-          status: session.status,
-          time: session.startedAt ? elapsed((session.status === 'running' ? now : (session.endedAt ?? now)) - session.startedAt) : '—',
-          extra: sessionUsd ? `${spend(undefined, sessionUsd)} total` : undefined,
-          tag: 'main',
-          color: MAIN_COLOR[palette],
-          open: view(),
-        })}
-        {/* No cut to the screen's height: the engine scrolls a body taller than its window. */}
-        {list.map(row =>
+        {[
           card({
-            key: `agent:${row.id}`,
-            title: `${row.parentId ? '↳ ' : ''}${LABEL[row.status].icon} ${row.description}`,
-            kind: row.teammate ? 'teammate' : 'subagent',
-            status: row.status,
-            time: elapsed((row.endedAt ?? now) - row.startedAt),
-            // Tokens and cost before the type: a narrow pane cuts the end of the line.
-          extra: [spend(row.tokens, row.usd), row.name ? row.type : ''].filter(Boolean).join(' · '),
-            tag: row.name ? `@${row.name}` : row.type,
-            color: colorOf(row, palette),
-            open: view(row.id),
+            key: 'agent:main',
+            title: `${session.status === 'running' ? '●' : '◌'} Main session`,
+            kind: 'main',
+            status: session.status,
+            time: session.startedAt ? elapsed((session.status === 'running' ? now : (session.endedAt ?? now)) - session.startedAt) : '—',
+            extra: sessionUsd ? `${spend(undefined, sessionUsd)} total` : undefined,
+            tag: 'main',
+            color: MAIN_COLOR[palette],
+            open: view(),
           }),
-        )}
+          ...list.map(row =>
+            card({
+              key: `agent:${row.id}`,
+              title: `${row.parentId ? '↳ ' : ''}${LABEL[row.status].icon} ${row.description}`,
+              kind: row.teammate ? 'teammate' : 'subagent',
+              status: row.status,
+              time: elapsed((row.endedAt ?? now) - row.startedAt),
+              // Tokens and cost before the type: a narrow pane cuts the end of the line.
+              extra: [spend(row.tokens, row.usd), row.name ? row.type : ''].filter(Boolean).join(' · '),
+              tag: row.name ? `@${row.name}` : row.type,
+              color: colorOf(row, palette),
+              open: view(row.id),
+            }),
+          ),
+        ].slice(first, first + fit)}
       </Box>
     )
   })

@@ -1,6 +1,6 @@
 {
   "name": "agent-sidebar",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "A tmux-style side pane that shows every subagent and teammate of the session as its own colored card: status, elapsed time, tokens and cost",
   "author": {
     "name": "shaasa",
